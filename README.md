@@ -1,6 +1,6 @@
 # PolySurf
 
-**PolySurf** is a small, focused Python package that builds slab + polymer systems using ASE and NumPy.
+**PolySurf** is a open-source, small, focused Python package that builds slab + polymer systems using ASE and NumPy.
 
 PolySurf's design principles:
 - **Single responsibility:** only generates structures (ASE `Atoms`); no job submission or DFT inputs.
