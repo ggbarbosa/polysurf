@@ -1,0 +1,65 @@
+# PolySurf
+
+**PolySurf** is a small, focused Python package that builds slab + polymer systems using ASE and NumPy.
+
+PolySurf's design principles:
+- **Single responsibility:** only generates structures (ASE `Atoms`); no job submission or DFT inputs.
+- **Framework-agnostic:** can be used standalone or integrated into workflows (AiiDA examples provided separately).
+- **Robust matching:** polymer chain-axis detection and vectorized search for best slab/polymer replication and stretch.
+
+## Quick example (native usage)
+
+```python
+from polysurf.builder import build_slab_polymer_system
+from ase.io import write
+
+slab_super, polymer_stretched, combined, info = build_slab_polymer_system(
+    slab_path='slab.xyz',
+    polymer_path='polymer.xyz',
+    v_step=3.0,        # vertical offset in Å
+    z_void=15.0,       # vacuum thickness in Å
+    lateral_min=10.0,  # minimum lateral spacing in Å
+    max_n_slab=30,
+    max_n_poly=5,
+    stretch_tol=(0.75, 1.25)
+)
+
+# Write structures to disk
+write("slab_super.xyz", slab_super)
+write("polymer_stretched.xyz", polymer_stretched)
+write("combined.xyz", combined)
+
+print(info)
+```
+
+## Integration with AiiDA (optional)
+
+If you want to integrate PolySurf into AiiDA workflows, simply convert the ASE outputs to `StructureData` and the metadata dict to `Dict`. This example is intentionally outside the core package (PolySurf does not depend on AiiDA):
+
+```python
+# example_aiida_integration.py (external to the package)
+from polysurf.builder import build_slab_polymer_system
+from aiida.orm import StructureData, Dict
+
+slab_super, polymer_rep, combined, info = build_slab_polymer_system(
+    slab_path="slab.xyz",
+    polymer_path="polymer.xyz"
+)
+
+slab_node = StructureData(ase=slab_super).store()
+polymer_node = StructureData(ase=polymer_rep).store()
+combined_node = StructureData(ase=combined).store()
+info_node = Dict(dict=info).store()
+```
+
+## Running tests locally
+
+```bash
+pip install -e .
+pip install pytest
+pytest -v
+```
+
+## License
+
+MIT

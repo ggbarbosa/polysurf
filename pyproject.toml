@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0","wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "polysurf"
+version = "0.1.0"
+description = "ASE-based builder to assemble slab + polymer systems for DFT workflows."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+authors = [
+  { name = "Gabriel Gouveia Barbosa", email = "gabriel.gbarbosa@outlook.com" }
+]
+
+dependencies = [
+  "ase>=3.22",
+  "numpy>=1.23",
+]
+
+[project.urls]
+"Home" = "https://github.com/ggbarbosa/polysurf"
+
+[tool.setuptools.packages.find]
+where = ["src"]
