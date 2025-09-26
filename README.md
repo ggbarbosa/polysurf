@@ -5,31 +5,45 @@
 PolySurf's design principles:
 - **Single responsibility:** only generates structures (ASE `Atoms`); no job submission or DFT inputs.
 - **Framework-agnostic:** can be used standalone or integrated into workflows (AiiDA examples provided separately).
-- **Robust matching:** polymer chain-axis detection and vectorized search for best slab/polymer replication and stretch.
+- **Robust matching:** vectorized search for best slab/polymer replication and stretch.
 
 ## Quick example (native usage)
 
 ```python
 from polysurf.builder import build_slab_polymer_system
 from ase.io import write
+import json
 
-slab_super, polymer_stretched, combined, info = build_slab_polymer_system(
-    slab_path='slab.xyz',
-    polymer_path='polymer.xyz',
-    v_step=3.0,        # vertical offset in Å
-    z_void=15.0,       # vacuum thickness in Å
-    lateral_min=10.0,  # minimum lateral spacing in Å
-    max_n_slab=30,
-    max_n_poly=5,
-    stretch_tol=(0.75, 1.25)
+# Input parameters
+slab_file = 'slab.xyz'
+polymer_file = 'polymer.xyz'
+chain_axis = "x"   # 'x' or 'y'
+v_step = 3.0       # Å
+z_void = 15.0      # Å
+lateral_min = 10.0 # Å
+max_rep = 100 # default
+stretch_ratio_range = (0.75, 1.25) # default
+
+# Build system
+slab, polymer, combined, info = build_slab_polymer_system(
+    slab_file,
+    polymer_file,
+    chain_axis,
+    v_step,
+    z_void,
+    lateral_min
 )
 
-# Write structures to disk
-write("slab_super.xyz", slab_super)
-write("polymer_stretched.xyz", polymer_stretched)
+# Save outputs
+write("slab_super.xyz", slab)
+write("polymer_stretched.xyz", polymer)
 write("combined.xyz", combined)
 
-print(info)
+# Save metadata
+with open("metadata.json", "w") as f:
+    json.dump(info, f, indent=2)
+
+print("Test completed. Files generated: slab_super.xyz, polymer_stretched.xyz, combined.xyz, metadata.json")
 ```
 
 ## Integration with AiiDA (optional)
@@ -41,13 +55,13 @@ If you want to integrate PolySurf into AiiDA workflows, simply convert the ASE o
 from polysurf.builder import build_slab_polymer_system
 from aiida.orm import StructureData, Dict
 
-slab_super, polymer_rep, combined, info = build_slab_polymer_system(
+slab_super, polymer_stretched, combined, info = build_slab_polymer_system(
     slab_path="slab.xyz",
     polymer_path="polymer.xyz"
 )
 
 slab_node = StructureData(ase=slab_super).store()
-polymer_node = StructureData(ase=polymer_rep).store()
+polymer_node = StructureData(ase=polymer_stretched).store()
 combined_node = StructureData(ase=combined).store()
 info_node = Dict(dict=info).store()
 ```
