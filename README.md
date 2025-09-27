@@ -12,7 +12,7 @@ PolySurf's design principles:
 ```python
 import json
 from ase.io import write
-from polysurf import build_slab_polymer_system
+from polysurf import builder
 
 # Input parameters
 slab_file = "slab.xyz" # slab's 2D rectangular or square unit cell
@@ -23,7 +23,7 @@ z_void = 20.0      # (Å) vacuum in z
 lateral_min = 15.0 # (Å) minimal lateral separation between polymer images
 
 # Build system
-slab, polymer, combined, info = build_slab_polymer_system(
+slab, polymer, combined, info = builder(
     slab_file,
     polymer_file,
     chain_axis,
