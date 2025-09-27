@@ -1,9 +1,9 @@
 [project]
 name = "polysurf"
 version = "0.2.0"
-description = "Construtor simplificado de sistemas slab + polímero usando ASE"
+description = "ASE-based builder to assemble slab + polymer systems for DFT workflows"
 authors = [
-  {name = "Gabriel Barbosa", email = "gabriel@example.com"}
+  {name = "Gabriel Gouveia Barbosa"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
