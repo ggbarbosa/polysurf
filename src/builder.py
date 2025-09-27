@@ -35,7 +35,7 @@ def min_polymer_image_distance(polymer: Atoms, cell: np.ndarray, orth_idx: int) 
     return float(np.min(cdist(coords, coords_image)))
 
 
-def build_slab_polymer_system(
+def builder(
     slab_path: str,
     polymer_path: str,
     chain_axis: str,
