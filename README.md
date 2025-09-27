@@ -49,14 +49,8 @@ print("Test completed. Files generated: slab_final.xyz, polymer_final.xyz, combi
 If you want to integrate PolySurf into AiiDA workflows, simply convert the ASE outputs to `StructureData` and the metadata dict to `Dict`. This example is intentionally outside the core package (PolySurf does not depend on AiiDA):
 
 ```python
-# example_aiida_integration.py (external to the package)
-from polysurf import builder
+# example_aiida_integration.py (external to the package) after runing 'Quick example (native usage)'
 from aiida.orm import StructureData, Dict
-
-slab_super, polymer_stretched, combined, info = builder(
-    slab_path="slab.xyz",
-    polymer_path="polymer.xyz"
-)
 
 slab_node = StructureData(ase=slab_super).store()
 polymer_node = StructureData(ase=polymer_stretched).store()
