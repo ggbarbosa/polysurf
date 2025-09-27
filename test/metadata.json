@@ -1,0 +1,15 @@
+{
+  "slab": "graphene_rectangular.xyz",
+  "polymer": "pe_2monomers_linear.xyz",
+  "a_cell_A": 12.3,
+  "b_cell_A": 4.261,
+  "c_cell_A": 19.666,
+  "m": 1,
+  "n": 5,
+  "nat": 32,
+  "chain_axis": "y",
+  "stretch_pct": -16.78,
+  "v_step_A": 2.5,
+  "z_void_A": 15.0,
+  "lateral_min_A": 10.0
+}
