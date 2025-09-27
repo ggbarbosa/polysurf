@@ -4,8 +4,8 @@ from ase.io import write
 from polysurf import build
 
 # Input parameters
-slab_file = "test/ti3c2o2_rectangular.xyz"
-polymer_file = "test/pe_2monomers_linear.xyz"
+slab_file = "ti3c2o2_rectangular.xyz"
+polymer_file = "pe_2monomers_linear.xyz"
 chain_axis = "y"
 v_step = 2.5
 z_void = 15.0
@@ -28,4 +28,5 @@ write("combined.xyz", combined)
 
 # Save metadata
 with open("metadata.json", "w") as f:
+
     json.dump(info, f, indent=2)
