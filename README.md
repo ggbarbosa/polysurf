@@ -33,8 +33,8 @@ slab, polymer, combined, info = builder(
 )
 
 # Save outputs
-write("slab_final.xyz", slab)
-write("polymer_final.xyz", polymer)
+write("slab_super.xyz", slab)
+write("polymer_stretched.xyz", polymer)
 write("combined.xyz", combined)
 
 # Save metadata
@@ -52,8 +52,8 @@ If you want to integrate PolySurf into AiiDA workflows, simply convert the ASE o
 # example_aiida_integration.py (external to the package) after runing 'Quick example (native usage)'
 from aiida.orm import StructureData, Dict
 
-slab_node = StructureData(ase=slab_super).store()
-polymer_node = StructureData(ase=polymer_stretched).store()
+slab_node = StructureData(ase=slab).store()
+polymer_node = StructureData(ase=polymer).store()
 combined_node = StructureData(ase=combined).store()
 info_node = Dict(dict=info).store()
 ```
