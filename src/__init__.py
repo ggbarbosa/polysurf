@@ -1,3 +1,3 @@
-from .builder import build_slab_polymer_system
+from .builder import builder
 
-__all__ = ["build_slab_polymer_system"]
+__all__ = ["builder"]
