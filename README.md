@@ -50,10 +50,10 @@ If you want to integrate PolySurf into AiiDA workflows, simply convert the ASE o
 
 ```python
 # example_aiida_integration.py (external to the package)
-from polysurf.builder import build_slab_polymer_system
+from polysurf.builder import builder
 from aiida.orm import StructureData, Dict
 
-slab_super, polymer_stretched, combined, info = build_slab_polymer_system(
+slab_super, polymer_stretched, combined, info = builder(
     slab_path="slab.xyz",
     polymer_path="polymer.xyz"
 )
