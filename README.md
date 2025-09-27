@@ -10,19 +10,17 @@ PolySurf's design principles:
 ## Quick example (native usage)
 
 ```python
-from polysurf.builder import build_slab_polymer_system
-from ase.io import write
 import json
+from ase.io import write
+from polysurf import build_slab_polymer_system
 
 # Input parameters
-slab_file = 'slab.xyz'
-polymer_file = 'polymer.xyz'
-chain_axis = "x"   # 'x' or 'y'
-v_step = 3.0       # Å
-z_void = 15.0      # Å
-lateral_min = 10.0 # Å
-max_rep = 100 # default
-stretch_ratio_range = (0.75, 1.25) # default
+slab_file = "slab.xyz" # slab's 2D rectangular or square unit cell
+polymer_file = "polymer.xyz" # polymer's straight one-dimensional unit cell
+chain_axis = "x"   # "x" or "y" polymer growth direction
+v_step = 3.0       # (Å) polymer-slab vertical separation
+z_void = 20.0      # (Å) vacuum in z
+lateral_min = 15.0 # (Å) minimal lateral separation between polymer images
 
 # Build system
 slab, polymer, combined, info = build_slab_polymer_system(
@@ -35,15 +33,15 @@ slab, polymer, combined, info = build_slab_polymer_system(
 )
 
 # Save outputs
-write("slab_super.xyz", slab)
-write("polymer_stretched.xyz", polymer)
+write("slab_final.xyz", slab)
+write("polymer_final.xyz", polymer)
 write("combined.xyz", combined)
 
 # Save metadata
 with open("metadata.json", "w") as f:
     json.dump(info, f, indent=2)
 
-print("Test completed. Files generated: slab_super.xyz, polymer_stretched.xyz, combined.xyz, metadata.json")
+print("Test completed. Files generated: slab_final.xyz, polymer_final.xyz, combined.xyz, metadata.json")
 ```
 
 ## Integration with AiiDA (optional)
