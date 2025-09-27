@@ -1,26 +1,33 @@
-[build-system]
-requires = ["setuptools>=61.0","wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "polysurf"
-version = "0.1.0"
-description = "ASE-based builder to assemble slab + polymer systems for DFT workflows."
-readme = "README.md"
-requires-python = ">=3.9"
-license = { text = "MIT" }
-
+version = "0.2.0"
+description = "Construtor simplificado de sistemas slab + polímero usando ASE"
 authors = [
-  { name = "Gabriel Gouveia Barbosa" }
+  {name = "Gabriel Barbosa", email = "gabriel@example.com"}
 ]
-
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
 dependencies = [
-  "ase>=3.22",
-  "numpy>=1.23",
+  "numpy",
+  "scipy",
+  "ase",
 ]
 
-[project.urls]
-"Home" = "https://github.com/ggbarbosa/polysurf"
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "black",
+  "isort",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
+include = ["polysurf*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
