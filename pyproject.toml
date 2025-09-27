@@ -14,20 +14,6 @@ dependencies = [
   "ase",
 ]
 
-[project.optional-dependencies]
-dev = [
-  "pytest",
-  "black",
-  "isort",
-]
-
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["polysurf*"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
