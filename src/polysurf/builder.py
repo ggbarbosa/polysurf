@@ -6,7 +6,6 @@ from ase.io import read
 from ase.build import make_supercell
 from scipy.spatial.distance import cdist
 
-
 def min_polymer_image_distance(polymer: Atoms, cell: np.ndarray, orth_idx: int) -> float:
     """
     Compute the minimum distance between polymer atoms and their periodic
@@ -33,7 +32,6 @@ def min_polymer_image_distance(polymer: Atoms, cell: np.ndarray, orth_idx: int) 
 
     coords_image = coords + shift_vec
     return float(np.min(cdist(coords, coords_image)))
-
 
 def build(
     slab_path: str,
@@ -66,7 +64,7 @@ def build(
     max_rep : int, optional
         Maximum allowed replication along the orthogonal axis (default: 100).
     stretch_ratio_range : Tuple[float, float], optional
-        Allowed stretch ratio range (default: (-1.10, 1.25)).
+        Allowed stretch ratio range (default: (-1.10, 1.10)).
 
     Returns
     -------
@@ -83,42 +81,63 @@ def build(
     slab = read(slab_path)
     polymer = read(polymer_path)
 
-    # Axis mapping
+    # Axis mapping for the input polymer
     axis_map = {"x": 0, "y": 1}
-    chain_idx = axis_map[chain_axis]
-    orth_idx = 1 if chain_idx == 0 else 0
+    poly_chain_idx = axis_map[chain_axis]
 
-    # Find best replication along chain axis and corresponding stretch
-    rep_chain = 1
-    best_stretch = None
-    poly_len = polymer.cell[chain_idx, chain_idx]
-    while rep_chain <= max_rep:
-        rm = np.eye(3, dtype=int)
-        rm[chain_idx, chain_idx] = rep_chain
-        slab_candidate = make_supercell(slab, rm)
+    # 1. Search BOTH slab axes to find the lowest strain
+    best_strain = float('inf')
+    best_slab_idx = None
+    best_rep = None
+    best_stretch_ratio = None
 
-        slab_len = slab_candidate.cell[chain_idx, chain_idx]
-        stretch_ratio = slab_len / poly_len
+    poly_len = polymer.cell[poly_chain_idx, poly_chain_idx]
 
-        if stretch_ratio_range[0] <= stretch_ratio <= stretch_ratio_range[1]:
-            best_stretch = (stretch_ratio - 1.0) * 100.0
-            slab_chain = slab_candidate
-            break
-        rep_chain += 1
+    for slab_idx in [0, 1]:
+        for rep in range(1, max_rep + 1):
+            slab_len = slab.cell[slab_idx, slab_idx] * rep
+            stretch_ratio = slab_len / poly_len
 
-    if best_stretch is None:
+            if stretch_ratio_range[0] <= stretch_ratio <= stretch_ratio_range[1]:
+                strain = (stretch_ratio - 1.0) * 100.0
+                # We want the minimum absolute strain (closest to 1.0 ratio)
+                if abs(strain) < abs(best_strain):
+                    best_strain = strain
+                    best_slab_idx = slab_idx
+                    best_rep = rep
+                    best_stretch_ratio = stretch_ratio
+
+    if best_slab_idx is None:
         raise RuntimeError("Unable to match slab and polymer within stretch ratio range.")
 
-    # Apply stretch to polymer
-    polymer_stretched = polymer.copy()
-    polymer_stretched.positions[:, chain_idx] *= (1.0 + best_stretch / 100.0)
+    # 2. Align polymer orientation to the best slab axis
+    polymer_oriented = polymer.copy()
+    if best_slab_idx != poly_chain_idx:
+        # Rotate polymer by 90 degrees around Z axis using its center of mass
+        com = polymer_oriented.get_center_of_mass()
+        polymer_oriented.rotate(90, 'z', center=com)
+        
+        # Swap the unit cell boundaries to match the rotation
+        cell = polymer_oriented.cell.copy()
+        cell[0], cell[1] = cell[1].copy(), cell[0].copy()
+        polymer_oriented.set_cell(cell)
 
-    # Replicate orthogonal axis until minimum polymer separation is satisfied
+    # Set the active indices based on our newly matched orientation
+    active_chain_idx = best_slab_idx
+    orth_idx = 1 if active_chain_idx == 0 else 0
+    rep_chain = best_rep
+    best_stretch = best_strain
+
+    # 3. Apply stretch to the properly oriented polymer
+    polymer_stretched = polymer_oriented.copy()
+    polymer_stretched.positions[:, active_chain_idx] *= best_stretch_ratio
+
+    # 4. Replicate orthogonal axis until minimum lateral separation is satisfied
     rep_orth = 1
     slab_super, polymer_centered = None, None
     while rep_orth <= max_rep:
         rm = np.eye(3, dtype=int)
-        rm[chain_idx, chain_idx] = rep_chain
+        rm[active_chain_idx, active_chain_idx] = rep_chain
         rm[orth_idx, orth_idx] = rep_orth
         slab_candidate = make_supercell(slab, rm)
 
@@ -140,12 +159,12 @@ def build(
     if slab_super is None:
         raise RuntimeError("Unable to satisfy lateral separation condition.")
 
-    # Vertical placement
+    # 5. Vertical placement
     slab_zmax = np.max(slab_super.positions[:, 2])
     polymer_zmin = np.min(polymer_centered.positions[:, 2])
     polymer_centered.translate([0.0, 0.0, slab_zmax - polymer_zmin + v_step])
 
-    # Combine slab + polymer
+    # 6. Combine slab + polymer
     combined = slab_super.copy()
     combined.extend(polymer_centered)
 
@@ -165,7 +184,7 @@ def build(
     slab_super.positions[:, 2] -= min_z
     polymer_centered.positions[:, 2] -= min_z
 
-    # Build metadata
+    # 7. Build metadata
     cell = combined.cell
     info = {
         "slab": slab_path,
@@ -176,7 +195,7 @@ def build(
         "m": rep_chain,
         "n": rep_orth,
         "nat": len(combined),
-        "chain_axis": chain_axis,
+        "chain_axis": "x" if active_chain_idx == 0 else "y",  # Reflected matched axis
         "stretch_pct": round(best_stretch, 2),
         "v_step_A": round(v_step, 3),
         "z_void_A": round(z_void, 3),
