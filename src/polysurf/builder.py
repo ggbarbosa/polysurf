@@ -43,7 +43,7 @@ def build(
     z_void: float,
     lateral_min: float,
     max_rep: int = 100,
-    stretch_ratio_range: Tuple[float, float] = (0.75, 1.25),
+    stretch_ratio_range: Tuple[float, float] = (-1.10, 1.10),
 ) -> Tuple[Atoms, Atoms, Atoms, Dict]:
     """
     Build a combined slab + polymer system with automatic stretch,
@@ -66,7 +66,7 @@ def build(
     max_rep : int, optional
         Maximum allowed replication along the orthogonal axis (default: 100).
     stretch_ratio_range : Tuple[float, float], optional
-        Allowed stretch ratio range (default: (0.75, 1.25)).
+        Allowed stretch ratio range (default: (-1.10, 1.25)).
 
     Returns
     -------
